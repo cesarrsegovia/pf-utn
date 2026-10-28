@@ -1,0 +1,24 @@
+# Dependencias
+/node_modules
+
+# Next.js
+/.next/
+/out/
+next-env.d.ts
+
+# Producción
+/build
+
+# Variables de entorno (se versiona solo el ejemplo)
+.env*
+!.env.example
+
+# Logs y varios
+npm-debug.log*
+*.tsbuildinfo
+.DS_Store
+/coverage
+
+/docs
+CLAUDE.md
+AGENTS.md

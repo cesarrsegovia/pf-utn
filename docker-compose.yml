@@ -1,0 +1,25 @@
+# Base de datos de SIGCAN para desarrollo y tests.
+# Se expone en el puerto 5433 para no chocar con un PostgreSQL local en 5432.
+services:
+  db:
+    image: postgres:18
+    container_name: sigcan-db
+    environment:
+      POSTGRES_USER: sigcan
+      POSTGRES_PASSWORD: sigcan
+      POSTGRES_DB: sigcan
+    ports:
+      - "5433:5432"
+    volumes:
+      # A partir de postgres:18 el volumen se monta en /var/lib/postgresql (no en /data).
+      - sigcan-datos:/var/lib/postgresql
+      # Scripts que se ejecutan solo la primera vez que se crea el volumen.
+      - ./docker/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sigcan -d sigcan"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  sigcan-datos:
