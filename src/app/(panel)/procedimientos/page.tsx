@@ -1,6 +1,9 @@
+import type { Metadata } from "next";
 import { EncabezadoPagina } from "@/components/comunes/encabezado-pagina";
 import { TurnosParaAtender } from "@/components/procedimientos/turnos-para-atender";
 import { exigirPermisoPagina } from "@/lib/sesion";
+
+export const metadata: Metadata = { title: "Procedimientos" };
 
 /** F7 — Registro de procedimientos (solo veterinarios). */
 export default async function PaginaProcedimientos() {

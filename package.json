@@ -11,6 +11,8 @@
     "db:seed": "tsx scripts/db.ts seed",
     "db:reset": "tsx scripts/db.ts reset",
     "db:reset:test": "tsx scripts/db.ts reset --test",
+    "db:demo": "tsx scripts/db.ts demo",
+    "db:demo:test": "tsx scripts/db.ts demo --test",
     "test": "vitest run",
     "test:watch": "vitest"
   },

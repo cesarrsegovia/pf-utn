@@ -1,6 +1,9 @@
+import type { Metadata } from "next";
 import { HistorialClinico } from "@/components/historial/historial-clinico";
 import { exigirPermisoPagina } from "@/lib/sesion";
 import { esquemaId } from "@/schemas/comun";
+
+export const metadata: Metadata = { title: "Historial clínico" };
 
 /** F8 — Historial clínico (consulta para todos los roles). `?animal=ID` filtra por animal. */
 export default async function PaginaHistorial({ searchParams }: { searchParams: Promise<{ animal?: string }> }) {

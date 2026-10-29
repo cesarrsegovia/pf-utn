@@ -4,6 +4,8 @@
  *   npm run db:seed          carga los datos iniciales (idempotente)
  *   npm run db:reset         borra todo, migra y siembra
  *   npm run db:reset:test    igual que reset, pero sobre la base de test
+ *   npm run db:demo          borra todo, migra, siembra y carga los datos de demostración
+ *   npm run db:demo:test     igual que demo, pero sobre la base de test (prueba de humo de la Fase 6)
  */
 import { loadEnvConfig } from "@next/env";
 
@@ -22,7 +24,16 @@ async function main() {
   const { sequelize } = await import("@/lib/db");
   const { crearMigrador } = await import("../db/migrador");
   const { sembrarDatosIniciales } = await import("../db/seeders/inicial");
+  const { sembrarDatosDemo } = await import("../db/seeders/demo");
   const migrador = crearMigrador(sequelize);
+
+  /** Elimina el esquema completo (tablas, índices y registro de migraciones), lo recrea y siembra los datos iniciales. */
+  async function reiniciarBase(): Promise<number> {
+    await sequelize.query("DROP SCHEMA public CASCADE; CREATE SCHEMA public;");
+    const aplicadas = await migrador.up();
+    await sembrarDatosIniciales();
+    return aplicadas.length;
+  }
 
   try {
     switch (comando) {
@@ -37,15 +48,18 @@ async function main() {
         break;
       }
       case "reset": {
-        // Elimina el esquema completo (tablas, índices y registro de migraciones) y lo recrea.
-        await sequelize.query("DROP SCHEMA public CASCADE; CREATE SCHEMA public;");
-        const aplicadas = await migrador.up();
-        await sembrarDatosIniciales();
-        console.log(`Base reiniciada: ${aplicadas.length} migraciones aplicadas y datos iniciales cargados`);
+        const aplicadas = await reiniciarBase();
+        console.log(`Base reiniciada: ${aplicadas} migraciones aplicadas y datos iniciales cargados`);
+        break;
+      }
+      case "demo": {
+        const aplicadas = await reiniciarBase();
+        await sembrarDatosDemo();
+        console.log(`Base reiniciada con datos de demostración (${aplicadas} migraciones aplicadas)`);
         break;
       }
       default:
-        console.error("Comando desconocido. Usar: migrar | seed | reset [--test]");
+        console.error("Comando desconocido. Usar: migrar | seed | reset | demo [--test]");
         process.exitCode = 1;
     }
   } finally {

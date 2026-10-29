@@ -65,8 +65,11 @@ async function exigirChipLibre(chip: string, transaction: Transaction): Promise<
   }
 }
 
-/** Descripción del historial clínico: tipo, veterinario, chip, insumos y observaciones. */
-function redactarDescripcion(
+/**
+ * Descripción del historial clínico: tipo, veterinario, chip, insumos y observaciones.
+ * Se exporta para que el seed de demostración redacte el historial igual que F7.
+ */
+export function redactarDescripcion(
   tipo: TipoProcedimiento,
   veterinario: Veterinario,
   chip: string | null,

@@ -1,6 +1,9 @@
+import type { Metadata } from "next";
 import { GestionAnimales } from "@/components/animales/gestion-animales";
 import { tienePermiso } from "@/lib/permisos";
 import { exigirPermisoPagina } from "@/lib/sesion";
+
+export const metadata: Metadata = { title: "Animales" };
 
 /** F2 — Animales (gestión: administrador y operador; consulta: veterinario). */
 export default async function PaginaAnimales() {

@@ -1,8 +1,11 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { DetalleInsumo } from "@/components/insumos/detalle-insumo";
 import { tienePermiso } from "@/lib/permisos";
 import { exigirPermisoPagina } from "@/lib/sesion";
 import { esquemaId } from "@/schemas/comun";
+
+export const metadata: Metadata = { title: "Detalle de insumo" };
 
 /** F6 — Detalle de un insumo con sus movimientos de stock. */
 export default async function PaginaDetalleInsumo({ params }: { params: Promise<{ id: string }> }) {

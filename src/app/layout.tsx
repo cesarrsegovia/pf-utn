@@ -14,7 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "SIGCAN — Castración y Chipeo Animal",
+  // Cada página define su título; la plantilla agrega el nombre del sistema ("Vecinos · SIGCAN").
+  title: { default: "SIGCAN — Castración y Chipeo Animal", template: "%s · SIGCAN" },
   description: "Sistema de Gestión de Castración y Chipeo Animal del Municipio de Río Grande",
 };
 

@@ -1,8 +1,11 @@
+import type { Metadata } from "next";
 import { EncabezadoPagina } from "@/components/comunes/encabezado-pagina";
 import { PanelDashboard } from "@/components/dashboard/panel-dashboard";
 import { ETIQUETAS_ROL } from "@/lib/etiquetas";
 import { exigirPermisoPagina } from "@/lib/sesion";
 import { resumenDashboard } from "@/services/dashboard";
+
+export const metadata: Metadata = { title: "Inicio" };
 
 /** Inicio del panel: panorama del programa (administrador y operador) o turnos del día (veterinario). */
 export default async function PaginaDashboard() {
