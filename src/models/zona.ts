@@ -14,5 +14,6 @@ Zona.init(
     nombre: { type: DataTypes.STRING(80), allowNull: false, unique: true },
     descripcion: { type: DataTypes.STRING(255), allowNull: true },
   },
-  { sequelize, tableName: "zona" },
+  // modelName explícito: el minificado de producción renombra las clases y haría colisionar los modelos.
+  { sequelize, modelName: "Zona", tableName: "zona" },
 );

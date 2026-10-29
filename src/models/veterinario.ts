@@ -33,5 +33,6 @@ Veterinario.init(
     activo: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: true },
     usuario_id: { type: DataTypes.INTEGER, allowNull: true, unique: true },
   },
-  { sequelize, tableName: "veterinario" },
+  // modelName explícito: el minificado de producción renombra las clases y haría colisionar los modelos.
+  { sequelize, modelName: "Veterinario", tableName: "veterinario" },
 );

@@ -33,5 +33,6 @@ MovimientoInsumo.init(
     usuario_id: { type: DataTypes.INTEGER, allowNull: false },
     procedimiento_id: { type: DataTypes.INTEGER, allowNull: true },
   },
-  { sequelize, tableName: "movimiento_insumo" },
+  // modelName explícito: el minificado de producción renombra las clases y haría colisionar los modelos.
+  { sequelize, modelName: "MovimientoInsumo", tableName: "movimiento_insumo" },
 );

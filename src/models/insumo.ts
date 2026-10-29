@@ -25,5 +25,6 @@ Insumo.init(
     stock_actual: { type: DataTypes.DECIMAL(10, 2), allowNull: false, defaultValue: "0" },
     stock_minimo: { type: DataTypes.DECIMAL(10, 2), allowNull: false, defaultValue: "0" },
   },
-  { sequelize, tableName: "insumo" },
+  // modelName explícito: el minificado de producción renombra las clases y haría colisionar los modelos.
+  { sequelize, modelName: "Insumo", tableName: "insumo" },
 );

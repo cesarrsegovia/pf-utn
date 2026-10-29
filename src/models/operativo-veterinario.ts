@@ -15,5 +15,6 @@ OperativoVeterinario.init(
     operativo_id: { type: DataTypes.INTEGER, primaryKey: true },
     veterinario_id: { type: DataTypes.INTEGER, primaryKey: true },
   },
-  { sequelize, tableName: "operativo_veterinario" },
+  // modelName explícito: el minificado de producción renombra las clases y haría colisionar los modelos.
+  { sequelize, modelName: "OperativoVeterinario", tableName: "operativo_veterinario" },
 );

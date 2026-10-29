@@ -43,5 +43,6 @@ ReporteAvistamiento.init(
     usuario_id: { type: DataTypes.INTEGER, allowNull: false },
     operativo_id: { type: DataTypes.INTEGER, allowNull: true },
   },
-  { sequelize, tableName: "reporte_avistamiento" },
+  // modelName explícito: el minificado de producción renombra las clases y haría colisionar los modelos.
+  { sequelize, modelName: "ReporteAvistamiento", tableName: "reporte_avistamiento" },
 );

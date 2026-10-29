@@ -20,5 +20,6 @@ HistorialClinico.init(
     descripcion: { type: DataTypes.TEXT, allowNull: false },
     procedimiento_id: { type: DataTypes.INTEGER, allowNull: false, unique: true },
   },
-  { sequelize, tableName: "historial_clinico" },
+  // modelName explícito: el minificado de producción renombra las clases y haría colisionar los modelos.
+  { sequelize, modelName: "HistorialClinico", tableName: "historial_clinico" },
 );

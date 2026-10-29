@@ -16,5 +16,6 @@ Rol.init(
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     nombre: { type: DataTypes.STRING(30), allowNull: false, unique: true },
   },
-  { sequelize, tableName: "rol" },
+  // modelName explícito: el minificado de producción renombra las clases y haría colisionar los modelos.
+  { sequelize, modelName: "Rol", tableName: "rol" },
 );

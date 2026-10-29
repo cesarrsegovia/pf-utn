@@ -34,5 +34,6 @@ Animal.init(
     numero_chip: { type: DataTypes.STRING(20), allowNull: true, unique: true },
     vecino_id: { type: DataTypes.INTEGER, allowNull: true },
   },
-  { sequelize, tableName: "animal" },
+  // modelName explícito: el minificado de producción renombra las clases y haría colisionar los modelos.
+  { sequelize, modelName: "Animal", tableName: "animal" },
 );

@@ -20,5 +20,6 @@ ProcedimientoInsumo.init(
     insumo_id: { type: DataTypes.INTEGER, primaryKey: true },
     cantidad_usada: { type: DataTypes.DECIMAL(10, 2), allowNull: false },
   },
-  { sequelize, tableName: "procedimiento_insumo" },
+  // modelName explícito: el minificado de producción renombra las clases y haría colisionar los modelos.
+  { sequelize, modelName: "ProcedimientoInsumo", tableName: "procedimiento_insumo" },
 );

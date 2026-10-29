@@ -35,5 +35,6 @@ Turno.init(
     animal_id: { type: DataTypes.INTEGER, allowNull: false },
     operativo_id: { type: DataTypes.INTEGER, allowNull: false },
   },
-  { sequelize, tableName: "turno" },
+  // modelName explícito: el minificado de producción renombra las clases y haría colisionar los modelos.
+  { sequelize, modelName: "Turno", tableName: "turno" },
 );

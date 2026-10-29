@@ -34,5 +34,6 @@ Vecino.init(
     fecha_baja: { type: DataTypes.DATEONLY, allowNull: true },
     zona_id: { type: DataTypes.INTEGER, allowNull: false },
   },
-  { sequelize, tableName: "vecino" },
+  // modelName explícito: el minificado de producción renombra las clases y haría colisionar los modelos.
+  { sequelize, modelName: "Vecino", tableName: "vecino" },
 );

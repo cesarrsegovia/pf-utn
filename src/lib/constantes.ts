@@ -41,3 +41,52 @@ export type EstadoEnvio = (typeof ESTADOS_ENVIO)[number];
 
 /** Zona horaria oficial de Río Grande (UTC-3, sin horario de verano). */
 export const ZONA_HORARIA = "America/Argentina/Ushuaia";
+
+/** Motivos de cancelación de turnos generados automáticamente por el sistema. */
+export const MOTIVOS_CANCELACION = {
+  /** F1: el vecino fue dado de baja (cascada sobre sus turnos activos). */
+  bajaVecino: "Baja del vecino",
+  /** F4: el operativo finalizó y el turno seguía pendiente o confirmado. */
+  noSePresento: "No se presentó",
+  /** F4: el administrador canceló el operativo (su motivo queda en el operativo). */
+  operativoCancelado: "Cancelación del operativo",
+} as const;
+
+/** Estados de turno que ocupan un lugar del cupo del operativo (los cancelados lo liberan). */
+export const ESTADOS_TURNO_CON_CUPO = ["pendiente", "confirmado", "completado"] as const;
+
+/** Estados de turno activos: se pueden confirmar, reprogramar o cancelar. */
+export const ESTADOS_TURNO_ACTIVOS = ["pendiente", "confirmado"] as const;
+
+/** Indica si un turno sigue activo (pendiente o confirmado). */
+export function esTurnoActivo(estado: EstadoTurno): boolean {
+  return estado === "pendiente" || estado === "confirmado";
+}
+
+/** Anticipación mínima para cancelar un operativo sin invocar fuerza mayor (F4). */
+export const HORAS_MINIMAS_CANCELACION = 48;
+
+/** Anticipación con la que se programa el recordatorio de un turno confirmado (F3/F12). */
+export const HORAS_RECORDATORIO = 24;
+
+/** Indica si el tipo solicitado o realizado incluye castración. */
+export function incluyeCastracion(tipo: TipoProcedimiento): boolean {
+  return tipo !== "chipeo";
+}
+
+/** Indica si el tipo solicitado o realizado incluye chipeo. */
+export function incluyeChipeo(tipo: TipoProcedimiento): boolean {
+  return tipo !== "castracion";
+}
+
+/**
+ * Indica si el tipo realizado está incluido en el solicitado: "castración y chipeo" admite
+ * castración, chipeo o ambos; "castración" o "chipeo" solo admiten ese mismo tipo (F7).
+ */
+export function tipoIncluido(realizado: TipoProcedimiento, solicitado: TipoProcedimiento): boolean {
+  return (
+    (!incluyeCastracion(realizado) || incluyeCastracion(solicitado)) &&
+    (!incluyeChipeo(realizado) || incluyeChipeo(solicitado))
+  );
+}
+

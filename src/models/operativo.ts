@@ -42,5 +42,6 @@ Operativo.init(
     usuario_cancelacion_id: { type: DataTypes.INTEGER, allowNull: true },
     zona_id: { type: DataTypes.INTEGER, allowNull: false },
   },
-  { sequelize, tableName: "operativo" },
+  // modelName explícito: el minificado de producción renombra las clases y haría colisionar los modelos.
+  { sequelize, modelName: "Operativo", tableName: "operativo" },
 );
