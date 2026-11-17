@@ -45,7 +45,7 @@ export default function PaginaLogin() {
         <div className="animar-entrada-marca relative z-10 mt-10 max-w-lg lg:mt-0">
           <h1 className="text-6xl leading-none font-bold tracking-wide text-sidebar-primary sm:text-7xl lg:text-8xl">SIGCAN</h1>
           <p className="mt-4 text-lg leading-relaxed text-sidebar-foreground sm:text-xl">
-            Gestión de castración y chipeo de perros y gatos en Río Grande, Tierra del Fuego.
+            Gestión de castración y chipeo de perros en Río Grande, Tierra del Fuego.
           </p>
         </div>
 

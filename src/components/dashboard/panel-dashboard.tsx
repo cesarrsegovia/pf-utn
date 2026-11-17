@@ -78,7 +78,8 @@ const COLUMNAS_OPERATIVOS: Columna<OperativoDto>[] = [
     ),
   },
   { titulo: "Zona", celda: (o) => o.zona },
-  { titulo: "Lugar", celda: (o) => o.lugar },
+  // El lugar es el texto más largo: puede ocupar dos líneas para que la tabla entre en la tarjeta.
+  { titulo: "Lugar", className: "min-w-36 whitespace-normal", celda: (o) => o.lugar },
   { titulo: "Disponibles", className: "text-right", celda: (o) => `${o.disponibles} de ${o.cupo_maximo}` },
 ];
 

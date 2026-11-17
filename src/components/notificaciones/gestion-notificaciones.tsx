@@ -18,8 +18,11 @@ import { formatearFechaHora } from "@/lib/fechas";
 import { mensajeDeError } from "@/lib/formularios";
 import type { NotificacionDto, ResultadoProcesamiento } from "@/services/notificaciones";
 
-/** Pantalla de F12: notificaciones por correo con filtros, envío a demanda y reintento de fallidas. */
-export function GestionNotificaciones({ puedeGestionar }: { puedeGestionar: boolean }) {
+/**
+ * Pantalla de F12: notificaciones por correo con filtros, envío a demanda y reintento de fallidas.
+ * `envioAutomatico` indica si el servidor de correo está configurado (y por lo tanto el envío periódico activo).
+ */
+export function GestionNotificaciones({ puedeGestionar, envioAutomatico }: { puedeGestionar: boolean; envioAutomatico: boolean }) {
   const listado = useListado<NotificacionDto>("/api/notificaciones", { tipo: "", estado: "", desde: "", hasta: "" });
   const [procesando, setProcesando] = useState(false);
 
@@ -89,7 +92,11 @@ export function GestionNotificaciones({ puedeGestionar }: { puedeGestionar: bool
     <>
       <EncabezadoPagina
         titulo="Notificaciones"
-        descripcion="Correos a los vecinos sobre sus turnos. Las pendientes se envían automáticamente cada minuto."
+        descripcion={
+          envioAutomatico
+            ? "Correos a los vecinos sobre sus turnos. Las pendientes se envían automáticamente cada minuto."
+            : "Correos a los vecinos sobre sus turnos. El servidor de correo no está configurado: los avisos quedan registrados como pendientes y no se envían."
+        }
         acciones={
           puedeGestionar && (
             <Button onClick={procesar} disabled={procesando}>

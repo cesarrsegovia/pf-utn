@@ -9,16 +9,19 @@ import type { Opcion } from "@/schemas/comun";
  * Lista desplegable de registros (zonas, tutores, usuarios…) cargada desde la API.
  * Es controlada (`valor`/`onCambiar`) para usarla con `Controller` de react-hook-form:
  * así muestra el valor correcto aunque las opciones lleguen después de montar el formulario.
+ * `excluir` oculta ids que no corresponde ofrecer (por ejemplo, personal ya asignado).
  */
-export function SelectOpciones({ id, url, valor, onCambiar, placeholder = "Seleccione…", invalido }: {
+export function SelectOpciones({ id, url, valor, onCambiar, placeholder = "Seleccione…", invalido, excluir }: {
   id: string;
   url: string;
   valor: number | null;
   onCambiar: (valor: number | null) => void;
   placeholder?: string;
   invalido?: boolean;
+  excluir?: number[];
 }) {
   const { data, isLoading } = useSWR<Opcion[]>(url, obtenerJson);
+  const opciones = excluir?.length ? data?.filter((opcion) => !excluir.includes(opcion.id)) : data;
   return (
     <NativeSelect
       id={id}
@@ -29,7 +32,7 @@ export function SelectOpciones({ id, url, valor, onCambiar, placeholder = "Selec
       onChange={(evento) => onCambiar(evento.target.value === "" ? null : Number(evento.target.value))}
     >
       <NativeSelectOption value="">{isLoading ? "Cargando…" : placeholder}</NativeSelectOption>
-      {data?.map((opcion) => (
+      {opciones?.map((opcion) => (
         <NativeSelectOption key={opcion.id} value={String(opcion.id)}>{opcion.etiqueta}</NativeSelectOption>
       ))}
     </NativeSelect>

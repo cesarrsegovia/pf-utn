@@ -9,7 +9,7 @@ import type { DatosVecino, ParametrosListadoVecinos } from "@/schemas/vecinos";
 import {
   buscarPorId, condicionEstado, exigirReferencia, exigirValorUnico, nuloSiVacio, paginacion, type ResultadoBaja,
 } from "./comun";
-import { anularRecordatorios } from "./notificaciones";
+import { anularAvisosPendientes } from "./notificaciones";
 
 /** Representación pública de un vecino (F1). */
 export interface VecinoDto {
@@ -167,7 +167,7 @@ export async function eliminarVecino(id: number): Promise<ResultadoBaja> {
         { estado: "cancelado", motivo_cancelacion: MOTIVOS_CANCELACION.bajaVecino },
         { where: { id: idsTurnos }, transaction },
       );
-      await anularRecordatorios(idsTurnos, transaction);
+      await anularAvisosPendientes(idsTurnos, transaction);
     }
     return { resultado: "desactivado", turnosCancelados: idsTurnos.length };
   });

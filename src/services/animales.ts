@@ -1,5 +1,5 @@
 import { Op, type Transaction } from "sequelize";
-import type { CondicionAnimal, SexoAnimal } from "@/lib/constantes";
+import { ESTADOS_TURNO_ACTIVOS, type CondicionAnimal, type SexoAnimal } from "@/lib/constantes";
 import { condicionBusqueda } from "@/lib/busqueda";
 import { Animal, sequelize, Turno, Vecino } from "@/lib/db";
 import { ReglaNegocioError, ValidacionError } from "@/lib/errores";
@@ -68,13 +68,30 @@ export async function listarAnimales(parametros: ParametrosListadoAnimales): Pro
 
 /**
  * Animales que pueden pedir turno (F3): callejeros/asilvestrados y los que tienen tutor
- * activo. La etiqueta muestra el tutor para distinguir animales con el mismo nombre.
+ * activo, excluidos los que ya tienen un turno activo (turno único) y los que ya están
+ * castrados y chipeados (no queda procedimiento por solicitar). Así el formulario no ofrece
+ * opciones que el servidor rechazaría. La etiqueta muestra el tutor para distinguir
+ * animales con el mismo nombre.
  */
 export async function opcionesAnimales(): Promise<Opcion[]> {
   const animales = await Animal.findAll({
     attributes: ["id", "nombre", "condicion"],
     include: [{ association: "vecino", attributes: ["id", "nombre", "apellido", "activo"], required: false }],
-    where: { [Op.or]: [{ vecino_id: null }, { "$vecino.activo$": true }] },
+    where: {
+      [Op.and]: [
+        { [Op.or]: [{ vecino_id: null }, { "$vecino.activo$": true }] },
+        // Sin turno pendiente o confirmado (mismos estados que valida `solicitarTurno`).
+        {
+          id: {
+            [Op.notIn]: sequelize.literal(
+              `(SELECT animal_id FROM turno WHERE estado IN (${ESTADOS_TURNO_ACTIVOS.map((estado) => `'${estado}'`).join(", ")}))`,
+            ),
+          },
+        },
+        // Con al menos un procedimiento pendiente: sin castrar o sin chip.
+        { [Op.or]: [{ castrado: false }, { numero_chip: null }] },
+      ],
+    },
     order: [["nombre", "ASC"], ["id", "ASC"]],
   });
   return animales.map((animal) => ({

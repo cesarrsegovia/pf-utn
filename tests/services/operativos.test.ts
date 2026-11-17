@@ -78,7 +78,7 @@ describe("alta, listado y edición (F4)", () => {
     await actualizarOperativo(operativo.id, await datosOperativo({ fecha: sumarDias(hoyLocal(), 8), cupo_maximo: 20 }));
     const notificaciones = await Notificacion.findAll({ where: { turno_id: turno.id }, order: [["id", "ASC"]] });
     expect(notificaciones.map((n) => [n.tipo, n.estado_envio])).toEqual([
-      ["confirmacion", "pendiente"],
+      ["confirmacion", "anulado"],
       ["recordatorio", "anulado"],
       ["reprogramacion", "pendiente"],
       ["recordatorio", "pendiente"],
@@ -227,5 +227,20 @@ describe("opciones para el formulario de turnos", () => {
     await crearAnimalPrueba({ vecinoId: (await crearVecinoPrueba({ activo: false })).id });
     const ids = (await opcionesAnimales()).map((opcion) => opcion.id).sort((a, b) => a - b);
     expect(ids).toEqual([callejero.id, conTutor.id].sort((a, b) => a - b));
+  });
+
+  it("no ofrece animales con un turno activo ni los ya castrados y chipeados", async () => {
+    const disponible = await crearAnimalPrueba();
+    const conTurnoActivo = await crearAnimalPrueba();
+    await crearTurnoPrueba(conTurnoActivo.id, (await crearOperativoPrueba()).id, "confirmado");
+    const conTurnoCancelado = await crearAnimalPrueba();
+    await crearTurnoPrueba(conTurnoCancelado.id, (await crearOperativoPrueba()).id, "cancelado");
+    const completo = await crearAnimalPrueba({ numeroChip: "985112000000555" });
+    await completo.update({ castrado: true });
+    const soloCastrado = await crearAnimalPrueba();
+    await soloCastrado.update({ castrado: true });
+
+    const ids = (await opcionesAnimales()).map((opcion) => opcion.id).sort((a, b) => a - b);
+    expect(ids).toEqual([disponible.id, conTurnoCancelado.id, soloCastrado.id].sort((a, b) => a - b));
   });
 });

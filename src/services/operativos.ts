@@ -14,7 +14,7 @@ import type {
   ParametrosListadoOperativos,
 } from "@/schemas/operativos";
 import { buscarPorId, exigirReferencia, paginacion } from "./comun";
-import { anularRecordatorios, cargarTurnoNotificable, notificar, programarRecordatorio } from "./notificaciones";
+import { anularAvisosPendientes, cargarTurnoNotificable, notificar, programarRecordatorio } from "./notificaciones";
 
 /** Representación pública de un operativo (F4). El cupo ocupado se calcula en la base. */
 export interface OperativoDto {
@@ -178,7 +178,7 @@ async function cancelarTurnosActivos(operativoId: number, motivo: string, transa
   const ids = activos.map((turno) => turno.id);
   if (ids.length > 0) {
     await Turno.update({ estado: "cancelado", motivo_cancelacion: motivo }, { where: { id: ids }, transaction });
-    await anularRecordatorios(ids, transaction);
+    await anularAvisosPendientes(ids, transaction);
   }
   return ids;
 }
@@ -343,7 +343,7 @@ export async function actualizarOperativo(id: number, datos: DatosOperativo): Pr
 
     if (cambiaFechaHorario || cambiaLugar) {
       const ids = activos.map((turno) => turno.id);
-      await anularRecordatorios(ids, transaction);
+      await anularAvisosPendientes(ids, transaction);
       for (const turnoId of ids) {
         const notificable = await cargarTurnoNotificable(turnoId, transaction);
         await notificar(notificable, "reprogramacion", transaction);

@@ -129,7 +129,7 @@ describe("confirmar turno", () => {
 });
 
 describe("reprogramar turno", () => {
-  it("cambia operativo y horario, anula el recordatorio anterior y programa uno nuevo", async () => {
+  it("cambia operativo y horario, anula los avisos pendientes anteriores y programa los nuevos", async () => {
     const { datos } = await escenario();
     const turno = await confirmarTurno((await solicitarTurno(datos)).id);
     const destino = await crearOperativoPrueba({ diasDesdeHoy: 10 });
@@ -137,7 +137,7 @@ describe("reprogramar turno", () => {
     const reprogramado = await reprogramarTurno(turno.id, { operativo_id: destino.id, horario: "11:30" });
     expect(reprogramado).toMatchObject({ operativo_id: destino.id, horario: "11:30", estado: "confirmado" });
     expect(await notificacionesDe(turno.id)).toEqual([
-      ["confirmacion", "pendiente"],
+      ["confirmacion", "anulado"],
       ["recordatorio", "anulado"],
       ["reprogramacion", "pendiente"],
       ["recordatorio", "pendiente"],
@@ -168,14 +168,14 @@ describe("reprogramar turno", () => {
 });
 
 describe("cancelar turno", () => {
-  it("anula el recordatorio y avisa la cancelación con el motivo; no cancela dos veces", async () => {
+  it("anula los avisos pendientes (confirmación y recordatorio) y avisa la cancelación con el motivo; no cancela dos veces", async () => {
     const { datos } = await escenario();
     const turno = await confirmarTurno((await solicitarTurno(datos)).id);
 
     const cancelado = await cancelarTurno(turno.id, { motivo: "El vecino no puede asistir" });
     expect(cancelado).toMatchObject({ estado: "cancelado", motivo_cancelacion: "El vecino no puede asistir" });
     expect(await notificacionesDe(turno.id)).toEqual([
-      ["confirmacion", "pendiente"],
+      ["confirmacion", "anulado"],
       ["recordatorio", "anulado"],
       ["cancelacion", "pendiente"],
     ]);

@@ -13,7 +13,7 @@ import type {
   DatosCancelarTurno, DatosReprogramarTurno, DatosSolicitarTurno, ParametrosListadoTurnos,
 } from "@/schemas/turnos";
 import { buscarPorId, exigirReferencia, paginacion } from "./comun";
-import { anularRecordatorios, cargarTurnoNotificable, notificar, programarRecordatorio } from "./notificaciones";
+import { anularAvisosPendientes, cargarTurnoNotificable, notificar, programarRecordatorio } from "./notificaciones";
 
 /** Representación pública de un turno (F3), con los datos del animal, tutor y operativo. */
 export interface TurnoDto {
@@ -288,7 +288,7 @@ export async function reprogramarTurno(id: number, datos: DatosReprogramarTurno)
     await validarDisponibilidad(destino, datos.horario, transaction, turno.id);
     await turno.update({ operativo_id: destino.id, horario: datos.horario }, { transaction });
 
-    await anularRecordatorios([id], transaction);
+    await anularAvisosPendientes([id], transaction);
     const notificable = await cargarTurnoNotificable(id, transaction);
     await notificar(notificable, "reprogramacion", transaction);
     await programarRecordatorio(notificable, transaction);
@@ -296,14 +296,14 @@ export async function reprogramarTurno(id: number, datos: DatosReprogramarTurno)
   });
 }
 
-/** Cancela un turno activo con motivo: anula su recordatorio y avisa al tutor. */
+/** Cancela un turno activo con motivo: anula sus avisos pendientes y avisa al tutor. */
 export async function cancelarTurno(id: number, datos: DatosCancelarTurno): Promise<TurnoDto> {
   return sequelize.transaction(async (transaction) => {
     const turno = await bloquearTurno(id, transaction);
     exigirActivo(turno, "cancelar");
     await turno.update({ estado: "cancelado", motivo_cancelacion: datos.motivo }, { transaction });
 
-    await anularRecordatorios([id], transaction);
+    await anularAvisosPendientes([id], transaction);
     const notificable = await cargarTurnoNotificable(id, transaction);
     await notificar(notificable, "cancelacion", transaction, datos.motivo);
     return obtenerTurnoDto(id, transaction);

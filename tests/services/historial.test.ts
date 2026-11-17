@@ -65,4 +65,22 @@ describe("historial clínico (F8)", () => {
     expect(porChip.total).toBe(2);
     expect(porChip.filas.every((f) => f.animal_id === animal.id && f.numero_chip === CHIP)).toBe(true);
   });
+
+  it("el filtro por castración o por chipeo incluye «castración y chipeo»", async () => {
+    await tresProcedimientos();
+    // Cuarto procedimiento: castración y chipeo en un mismo acto.
+    const { usuario, personal } = await crearVeterinarioConUsuario();
+    const operativo = await crearOperativoPrueba({ diasDesdeHoy: 0, estado: "en_curso" });
+    await OperativoVeterinario.create({ operativo_id: operativo.id, veterinario_id: personal.id });
+    const turno = await crearTurnoPrueba((await crearAnimalPrueba()).id, operativo.id, "confirmado");
+    await turno.update({ tipo_solicitado: "castracion_y_chipeo" });
+    await registrarProcedimiento(
+      { turno_id: turno.id, tipo: "castracion_y_chipeo", numero_chip_colocado: "985112000000999", observaciones: "", insumos: [] },
+      usuario.id,
+    );
+
+    expect((await listarHistorial({ ...BASE, tipo: "castracion" })).total).toBe(3);
+    expect((await listarHistorial({ ...BASE, tipo: "chipeo" })).total).toBe(2);
+    expect((await listarHistorial({ ...BASE, tipo: "castracion_y_chipeo" })).total).toBe(1);
+  });
 });

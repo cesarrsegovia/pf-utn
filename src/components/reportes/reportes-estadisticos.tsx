@@ -105,8 +105,8 @@ function IndicadorOcupacion({ ocupacion }: { ocupacion: ReporteEstadistico["ocup
   const datos = ocupacion.operativos.map((operativo) => ({ ...operativo, dia: formatearFecha(operativo.fecha).slice(0, 5) }));
   const columnas: Columna<OcupacionOperativo>[] = [
     { titulo: "Fecha", celda: (o) => formatearFecha(o.fecha) },
-    { titulo: "Lugar", celda: (o) => o.lugar },
-    { titulo: "Zona", celda: (o) => o.zona },
+    // Lugar y zona en una columna que puede ocupar dos líneas, para que la tabla entre en la tarjeta.
+    { titulo: "Lugar", className: "min-w-36 whitespace-normal", celda: (o) => `${o.lugar} (${o.zona})` },
     { titulo: "Asignados / cupo", className: "text-right", celda: (o) => `${o.asignados} / ${o.cupo_maximo}` },
     { titulo: "Ocupación", className: "text-right", celda: (o) => formatearPorcentaje(o.porcentaje) },
   ];

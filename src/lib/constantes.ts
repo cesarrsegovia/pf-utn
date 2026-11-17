@@ -80,6 +80,15 @@ export function incluyeChipeo(tipo: TipoProcedimiento): boolean {
 }
 
 /**
+ * Tipos que cumplen un filtro de consulta: filtrar por "castración" o por "chipeo" también
+ * trae los procedimientos de "castración y chipeo", que incluyen ambas prácticas.
+ */
+export function tiposQueIncluyen(filtro: TipoProcedimiento): TipoProcedimiento[] {
+  if (filtro === "castracion_y_chipeo") return [filtro];
+  return TIPOS_PROCEDIMIENTO.filter((tipo) => (filtro === "castracion" ? incluyeCastracion(tipo) : incluyeChipeo(tipo)));
+}
+
+/**
  * Indica si el tipo realizado está incluido en el solicitado: "castración y chipeo" admite
  * castración, chipeo o ambos; "castración" o "chipeo" solo admiten ese mismo tipo (F7).
  */

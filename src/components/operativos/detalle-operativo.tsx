@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import useSWR from "swr";
+import useSWR, { useSWRConfig } from "swr";
 import { ArrowLeft, Ban, CheckCircle2, Pencil, Play } from "lucide-react";
 import { toast } from "sonner";
 import { BadgeOperativo } from "@/components/comunes/badges-dominio";
@@ -27,6 +27,7 @@ export function DetalleOperativo({ id, puedeGestionar, puedeCancelar, puedeGesti
   puedeGestionarTurnos: boolean;
 }) {
   const { data: operativo, error, mutate } = useSWR<OperativoDetalleDto>(`/api/operativos/${id}`, obtenerJson);
+  const { mutate: mutarCache } = useSWRConfig();
   const [editando, setEditando] = useState(false);
   const [cancelando, setCancelando] = useState(false);
   const [nuevoEstado, setNuevoEstado] = useState<"en_curso" | "realizado" | null>(null);
@@ -36,6 +37,17 @@ export function DetalleOperativo({ id, puedeGestionar, puedeCancelar, puedeGesti
       <ArrowLeft /> Volver
     </Link>
   );
+  /**
+   * Recarga el operativo y todos los listados de turnos en caché. Finalizar o cancelar el
+   * operativo cambia el estado de sus turnos en el servidor, y la tabla de turnos debe reflejarlo.
+   */
+  async function actualizarOperativoYTurnos() {
+    await Promise.all([
+      mutate(),
+      mutarCache((clave) => typeof clave === "string" && clave.startsWith("/api/turnos")),
+    ]);
+  }
+
   if (error) return <EncabezadoPagina titulo="Operativo no encontrado" descripcion={error.message} acciones={volver} />;
   if (!operativo) return <p className="text-sm text-muted-foreground">Cargando…</p>;
 
@@ -53,7 +65,7 @@ export function DetalleOperativo({ id, puedeGestionar, puedeCancelar, puedeGesti
           : `Operativo finalizado. Turnos sin presentarse: ${turnosCancelados}`,
       );
       setNuevoEstado(null);
-      await mutate();
+      await actualizarOperativoYTurnos();
     } catch (error) {
       toast.error(mensajeDeError(error, "No se pudo cambiar el estado del operativo"));
     }
@@ -119,7 +131,7 @@ export function DetalleOperativo({ id, puedeGestionar, puedeCancelar, puedeGesti
           onCerrar={() => setCancelando(false)}
           onCancelado={async () => {
             setCancelando(false);
-            await mutate();
+            await actualizarOperativoYTurnos();
           }}
         />
       )}

@@ -75,6 +75,7 @@ export function PersonalOperativo({ operativo, puedeGestionar, onCambio }: {
             valor={seleccionado}
             onCambiar={setSeleccionado}
             placeholder="Agregar personal…"
+            excluir={operativo.personal.map((persona) => persona.id)}
           />
           <Button
             disabled={seleccionado === null || procesando}

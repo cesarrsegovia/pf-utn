@@ -10,7 +10,7 @@ import { ETIQUETAS_ESTADO_OPERATIVO, ETIQUETAS_ESTADO_TURNO, ETIQUETAS_TIPO_PROC
 import type { DatosProcedimiento } from "@/schemas/procedimientos";
 import { nuloSiVacio } from "./comun";
 import { descontarPorProcedimiento } from "./insumos";
-import { anularRecordatorios } from "./notificaciones";
+import { anularAvisosPendientes } from "./notificaciones";
 import { listarTurnosAtendibles, type TurnoDto } from "./turnos";
 
 /** Resultado del registro de un procedimiento (F7). */
@@ -158,9 +158,9 @@ export async function registrarProcedimiento(datos: DatosProcedimiento, usuarioI
       { transaction },
     );
 
-    // 8) Turno completado y recordatorio anulado.
+    // 8) Turno completado y avisos pendientes anulados.
     await turno.update({ estado: "completado" }, { transaction });
-    await anularRecordatorios([turno.id], transaction);
+    await anularAvisosPendientes([turno.id], transaction);
 
     // 9) Historial clínico (último paso: si falla, se revierte todo lo anterior).
     const descripcion = redactarDescripcion(datos.tipo, veterinario, chip, insumos, observaciones);

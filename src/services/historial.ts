@@ -1,5 +1,5 @@
 import { Op } from "sequelize";
-import type { TipoProcedimiento } from "@/lib/constantes";
+import { tiposQueIncluyen, type TipoProcedimiento } from "@/lib/constantes";
 import { condicionBusqueda } from "@/lib/busqueda";
 import { HistorialClinico } from "@/lib/db";
 import { nombreAnimal } from "@/lib/etiquetas";
@@ -42,7 +42,8 @@ export async function listarHistorial(parametros: ParametrosListadoHistorial): P
         attributes: ["id", "tipo", "fecha"],
         where: {
           [Op.and]: [
-            parametros.tipo ? { tipo: parametros.tipo } : {},
+            // "Castración" o "Chipeo" incluyen también "Castración y chipeo".
+            parametros.tipo ? { tipo: tiposQueIncluyen(parametros.tipo) } : {},
             condicionDiasLocales("fecha", parametros.desde, parametros.hasta),
           ],
         },

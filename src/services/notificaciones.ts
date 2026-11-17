@@ -118,15 +118,17 @@ export async function programarRecordatorio(turno: Turno, transaction: Transacti
 }
 
 /**
- * Anula los recordatorios todavía no enviados (pendientes o fallidos) de los turnos
- * indicados: el turno fue cancelado, reprogramado o completado. No se borran (trazabilidad).
+ * Anula los avisos todavía no enviados (pendientes o fallidos), de cualquier tipo, de los
+ * turnos indicados: el turno fue cancelado, reprogramado o completado y esos avisos quedaron
+ * desactualizados (por ejemplo, una confirmación con la fecha anterior). Quien llama genera
+ * después el aviso vigente (cancelación o reprogramación). No se borran (trazabilidad).
  */
-export async function anularRecordatorios(turnoIds: number[], transaction: Transaction): Promise<void> {
+export async function anularAvisosPendientes(turnoIds: number[], transaction: Transaction): Promise<void> {
   if (turnoIds.length === 0) return;
   await Notificacion.update(
     { estado_envio: "anulado" },
     {
-      where: { turno_id: turnoIds, tipo: "recordatorio", estado_envio: { [Op.in]: ["pendiente", "fallido"] } },
+      where: { turno_id: turnoIds, estado_envio: { [Op.in]: ["pendiente", "fallido"] } },
       transaction,
     },
   );
