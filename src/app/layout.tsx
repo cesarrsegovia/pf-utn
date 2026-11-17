@@ -1,13 +1,22 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Barlow_Semi_Condensed, Geist_Mono, Public_Sans } from "next/font/google";
 import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
+// Texto general, tablas y formularios: alta legibilidad para carga de datos.
+const publicSans = Public_Sans({
+  variable: "--font-public-sans",
+  subsets: ["latin", "latin-ext"],
 });
 
+// Títulos y cifras destacadas: tipografía de señalética pública, compacta y firme.
+const barlow = Barlow_Semi_Condensed({
+  variable: "--font-barlow",
+  subsets: ["latin", "latin-ext"],
+  weight: ["500", "600", "700"],
+});
+
+// Monoespaciada para códigos (por ejemplo, número de chip).
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
@@ -24,7 +33,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html
       lang="es"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${publicSans.variable} ${barlow.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
         {children}

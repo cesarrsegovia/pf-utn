@@ -39,7 +39,7 @@ function TarjetaIndicador({ titulo, descripcion, valor, children }: {
       <CardHeader>
         <CardTitle>{titulo}</CardTitle>
         <CardDescription>{descripcion}</CardDescription>
-        {valor && <p className="text-2xl font-semibold tracking-tight">{valor}</p>}
+        {valor && <p className="font-heading text-4xl leading-none font-semibold tabular-nums">{valor}</p>}
       </CardHeader>
       <CardContent className="grid gap-4">{children}</CardContent>
     </Card>

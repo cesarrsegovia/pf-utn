@@ -3,15 +3,21 @@ import { cn } from "@/lib/utils";
 
 /** Colores por tono semántico; cada fase mapea sus estados a uno de estos tonos. */
 const CLASES_TONO = {
-  exito: "bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300",
-  alerta: "bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300",
-  peligro: "bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-300",
-  info: "bg-sky-100 text-sky-800 dark:bg-sky-950 dark:text-sky-300",
+  exito: "bg-[#e2efe7] text-[#1f5a3d] dark:bg-[#183a2b] dark:text-[#9ad3b4]",
+  alerta: "bg-[#f8ecd2] text-[#7a520c] dark:bg-[#3d2f12] dark:text-[#e9c27a]",
+  peligro: "bg-[#f7e0de] text-[#8f1f18] dark:bg-[#43201d] dark:text-[#f2a39b]",
+  info: "bg-[#ddebf2] text-[#1e5672] dark:bg-[#17323f] dark:text-[#93c6de]",
   neutro: "bg-muted text-muted-foreground",
 } as const;
 export type TonoEstado = keyof typeof CLASES_TONO;
 
 /** Etiqueta de estado con color según su tono. */
 export function BadgeEstado({ texto, tono }: { texto: string; tono: TonoEstado }) {
-  return <Badge variant="outline" className={cn("border-transparent", CLASES_TONO[tono])}>{texto}</Badge>;
+  return (
+    <Badge variant="outline" className={cn("gap-1.5 border-transparent font-medium", CLASES_TONO[tono])}>
+      {/* Punto de color: refuerza el estado sin depender solo del texto. */}
+      <span className="size-1.5 rounded-full bg-current" aria-hidden="true" />
+      {texto}
+    </Badge>
+  );
 }

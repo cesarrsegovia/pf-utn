@@ -14,8 +14,8 @@ export default function ErrorPanel({ error, retry }: { error: unknown; retry: ()
   }, [error]);
 
   return (
-    <div role="alert" className="mx-auto mt-16 grid max-w-md gap-4 rounded-lg border p-6 text-center">
-      <h2 className="text-lg font-semibold">No se pudo mostrar esta página</h2>
+    <div role="alert" className="mx-auto mt-16 grid max-w-md gap-4 rounded-lg border bg-card p-8 text-center">
+      <h2 className="text-2xl font-semibold">No se pudo mostrar esta página</h2>
       <p className="text-sm text-muted-foreground">
         Ocurrió un error inesperado. Puede reintentar; si el problema continúa, avise al administrador.
       </p>

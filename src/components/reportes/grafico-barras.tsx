@@ -2,12 +2,16 @@
 
 import { Bar, BarChart, CartesianGrid, Legend, Tooltip, XAxis, YAxis } from "recharts";
 
-/** Colores de las series: contrastan sobre fondo claro y oscuro (el tema base es en grises). */
+/**
+ * Colores de las series, tomados de la paleta del tema (`--chart-*` en globals.css):
+ * cambian solos entre modo claro y oscuro. Los nombres describen el tono, no un valor fijo.
+ */
 export const COLORES_GRAFICO = {
-  azul: "#0284c7",
-  verde: "#059669",
-  ambar: "#d97706",
-  rojo: "#dc2626",
+  azul: "var(--chart-2)",
+  verde: "var(--chart-1)",
+  ambar: "var(--chart-3)",
+  rojo: "var(--chart-4)",
+  calafate: "var(--chart-5)",
 } as const;
 
 /** Serie de un gráfico de barras: propiedad del dato, nombre en la leyenda y color. */
@@ -42,29 +46,34 @@ export function GraficoBarras<T extends object>({ datos, claveX, series, apilada
       style={{ width: "100%", height: alto }}
       margin={{ top: 8, right: 8, left: 0, bottom: 0 }}
     >
-      <CartesianGrid strokeDasharray="3 3" vertical={false} />
-      <XAxis dataKey={claveX} tick={ticks} />
+      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" />
+      <XAxis dataKey={claveX} tick={ticks} stroke="var(--border)" />
       <YAxis
         allowDecimals={false}
         width={44}
         domain={porcentaje ? [0, 100] : undefined}
         unit={porcentaje ? "%" : undefined}
         tick={ticks}
+        stroke="var(--border)"
       />
       <Tooltip
         contentStyle={{
           backgroundColor: "var(--popover)",
           borderColor: "var(--border)",
           color: "var(--popover-foreground)",
+          borderRadius: 8,
         }}
+        cursor={{ fill: "var(--muted)" }}
       />
-      <Legend />
+      <Legend wrapperStyle={{ fontSize: 13 }} />
       {series.map((serie) => (
         <Bar
           key={serie.clave}
           dataKey={serie.clave}
           name={serie.nombre}
           fill={serie.color}
+          radius={apiladas ? 0 : [3, 3, 0, 0]}
+          maxBarSize={48}
           stackId={apiladas ? "total" : undefined}
         />
       ))}
