@@ -443,7 +443,7 @@ export async function sembrarDatosDemo(): Promise<void> {
     }
 
     // 8) Operativo de hoy (programado, para iniciarlo en el recorrido) con Ana y Carla.
-    const operativoHoy = await crearOperativo({ dias: 0, zona: 0, cupo: 15 }, [ana, carla], { horaFin: "18:00" });
+    const operativoHoy = await crearOperativo({ dias: 0, zona: 0, cupo: 15 }, [ana, carla], { horaFin: "23:00" });
     for (const [n, turno] of TURNOS_HOY.entries()) {
       await crearTurno(operativoHoy, n, turno.animal, turno.tipo, turno.estado);
     }
