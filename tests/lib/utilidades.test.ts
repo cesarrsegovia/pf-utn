@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { aCentesimos, deCentesimos, formatearCantidad } from "@/lib/cantidades";
-import { formatearFecha, sumarDias } from "@/lib/fechas";
+import { avisoRangoFechas, formatearFecha, sumarDias } from "@/lib/fechas";
 import { escaparLike, normalizarTexto } from "@/lib/texto";
 
 describe("texto", () => {
@@ -14,6 +14,13 @@ describe("texto", () => {
 });
 
 describe("fechas", () => {
+  it("avisa solo cuando «desde» es posterior a «hasta»", () => {
+    expect(avisoRangoFechas("2026-11-22", "2026-11-20")).toMatch(/no puede ser posterior/);
+    expect(avisoRangoFechas("2026-11-20", "2026-11-20")).toBeNull();
+    expect(avisoRangoFechas("2026-11-22", "")).toBeNull();
+    expect(avisoRangoFechas("", "2026-11-20")).toBeNull();
+  });
+
   it("suma días cruzando meses y años", () => {
     expect(sumarDias("2026-12-30", 3)).toBe("2027-01-02");
     expect(sumarDias("2026-03-01", -1)).toBe("2026-02-28");

@@ -59,6 +59,14 @@ export function limitesDelRango(desde: string, hasta: string): { inicio: Date; f
   return { inicio: instanteLocal(desde, "00:00"), fin: instanteLocal(sumarDias(hasta, 1), "00:00") };
 }
 
+/**
+ * Mensaje para un filtro de fechas invertido ("desde" posterior a "hasta"), o null si el rango
+ * es válido o está incompleto. Las fechas YYYY-MM-DD se comparan como texto.
+ */
+export function avisoRangoFechas(desde: string, hasta: string): string | null {
+  return desde && hasta && desde > hasta ? "Elija un rango válido: «desde» no puede ser posterior a «hasta»." : null;
+}
+
 /** Rango de los últimos `meses` meses calendario, incluido el actual: del día 1 de ese mes hasta hoy. */
 export function rangoUltimosMeses(meses: number, hoy = hoyLocal()): { desde: string; hasta: string } {
   const [anio, mes] = hoy.split("-").map(Number);

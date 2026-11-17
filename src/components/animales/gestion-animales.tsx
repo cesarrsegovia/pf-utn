@@ -14,7 +14,7 @@ import { Button, buttonVariants } from "@/components/ui/button";
 import { useEdicion } from "@/hooks/use-edicion";
 import { useListado } from "@/hooks/use-listado";
 import { llamarApi } from "@/lib/cliente-api";
-import { ETIQUETAS_CONDICION, ETIQUETAS_SEXO, opcionesDeEtiquetas } from "@/lib/etiquetas";
+import { ETIQUETAS_CONDICION, ETIQUETAS_SEXO, nombreAnimal, opcionesDeEtiquetas } from "@/lib/etiquetas";
 import { mensajeDeError } from "@/lib/formularios";
 import type { AnimalDto } from "@/services/animales";
 import { FormularioAnimal } from "./formulario-animal";
@@ -37,7 +37,7 @@ export function GestionAnimales({ puedeGestionar }: { puedeGestionar: boolean })
   }
 
   const columnas: Columna<AnimalDto>[] = [
-    { titulo: "Nombre", celda: (a) => a.nombre ?? "Sin nombre" },
+    { titulo: "Nombre", celda: (a) => nombreAnimal(a) },
     { titulo: "Sexo", celda: (a) => ETIQUETAS_SEXO[a.sexo] },
     { titulo: "Condición", celda: (a) => ETIQUETAS_CONDICION[a.condicion] },
     { titulo: "Tutor", celda: (a) => a.tutor ?? "—" },

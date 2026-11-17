@@ -11,7 +11,7 @@ import { buttonVariants } from "@/components/ui/button";
 import { useListado } from "@/hooks/use-listado";
 import { obtenerJson } from "@/lib/cliente-api";
 import { ETIQUETAS_TIPO_PROCEDIMIENTO, nombreAnimal, opcionesDeEtiquetas } from "@/lib/etiquetas";
-import { formatearFechaHora } from "@/lib/fechas";
+import { avisoRangoFechas, formatearFechaHora } from "@/lib/fechas";
 import type { AnimalDto } from "@/services/animales";
 import type { HistorialDto } from "@/services/historial";
 
@@ -26,7 +26,11 @@ export function HistorialClinico({ animalId }: { animalId?: number }) {
     desde: "",
     hasta: "",
   });
-  const { data: animal } = useSWR<AnimalDto>(animalId ? `/api/animales/${animalId}` : null, obtenerJson);
+  const { data: animal, error } = useSWR<AnimalDto>(animalId ? `/api/animales/${animalId}` : null, obtenerJson);
+  const verTodos = <Link href="/historial" className={buttonVariants({ variant: "outline" })}>Ver todos</Link>;
+
+  // Animal inexistente (por ejemplo, un enlace viejo): se avisa en lugar de mostrar un listado vacío.
+  if (error) return <EncabezadoPagina titulo="Animal no encontrado" descripcion={error.message} acciones={verTodos} />;
 
   const columnas: Columna<HistorialDto>[] = [
     { titulo: "Fecha", celda: (h) => formatearFechaHora(h.fecha) },
@@ -57,11 +61,7 @@ export function HistorialClinico({ animalId }: { animalId?: number }) {
             ? `Chip: ${animal.numero_chip ?? "sin chip"} · Tutor: ${animal.tutor ?? "sin tutor"}. Orden cronológico.`
             : "Procedimientos registrados (solo consulta). Elija un animal para ver su historial completo."
         }
-        acciones={
-          animalId && (
-            <Link href="/historial" className={buttonVariants({ variant: "outline" })}>Ver todos</Link>
-          )
-        }
+        acciones={animalId && verTodos}
       />
       <ListadoPaginado
         listado={listado}
@@ -69,6 +69,7 @@ export function HistorialClinico({ animalId }: { animalId?: number }) {
         claveFila={(h) => h.id}
         placeholderBusqueda={animalId ? undefined : "Buscar por animal, chip o veterinario/a"}
         mensajeVacio="No hay procedimientos registrados"
+        aviso={avisoRangoFechas(listado.filtros.desde, listado.filtros.hasta)}
         filtros={
           <>
             <FiltroSelect

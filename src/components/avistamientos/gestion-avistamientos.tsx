@@ -17,7 +17,7 @@ import { useEdicion } from "@/hooks/use-edicion";
 import { useListado } from "@/hooks/use-listado";
 import { llamarApi } from "@/lib/cliente-api";
 import { ETIQUETAS_ESTADO_AVISTAMIENTO, opcionesDeEtiquetas } from "@/lib/etiquetas";
-import { formatearFechaHora } from "@/lib/fechas";
+import { avisoRangoFechas, formatearFechaHora } from "@/lib/fechas";
 import { mensajeDeError } from "@/lib/formularios";
 import type { AvistamientoDto } from "@/services/avistamientos";
 import { FormularioAtenderAvistamiento } from "./formulario-atender-avistamiento";
@@ -102,6 +102,7 @@ export function GestionAvistamientos({ puedeGestionar }: { puedeGestionar: boole
         claveFila={(r) => r.id}
         placeholderBusqueda="Buscar por descripción, dirección o zona"
         mensajeVacio="No hay reportes de avistamiento"
+        aviso={avisoRangoFechas(listado.filtros.desde, listado.filtros.hasta)}
         filtros={
           <>
             <FiltroSelect

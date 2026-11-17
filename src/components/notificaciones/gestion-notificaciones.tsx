@@ -14,7 +14,7 @@ import { Input } from "@/components/ui/input";
 import { useListado } from "@/hooks/use-listado";
 import { llamarApi } from "@/lib/cliente-api";
 import { ETIQUETAS_ESTADO_ENVIO, ETIQUETAS_TIPO_NOTIFICACION, opcionesDeEtiquetas } from "@/lib/etiquetas";
-import { formatearFechaHora } from "@/lib/fechas";
+import { avisoRangoFechas, formatearFechaHora } from "@/lib/fechas";
 import { mensajeDeError } from "@/lib/formularios";
 import type { NotificacionDto, ResultadoProcesamiento } from "@/services/notificaciones";
 
@@ -111,6 +111,7 @@ export function GestionNotificaciones({ puedeGestionar, envioAutomatico }: { pue
         claveFila={(n) => n.id}
         placeholderBusqueda="Buscar por vecino o email"
         mensajeVacio="No hay notificaciones para mostrar"
+        aviso={avisoRangoFechas(listado.filtros.desde, listado.filtros.hasta)}
         filtros={
           <>
             <FiltroSelect

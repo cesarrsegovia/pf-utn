@@ -8,7 +8,7 @@ import { FiltroZona } from "@/components/comunes/filtro-zona";
 import { TablaDatos, type Columna } from "@/components/comunes/tabla-datos";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { obtenerJson } from "@/lib/cliente-api";
-import { formatearFecha, formatearMes, rangoUltimosMeses } from "@/lib/fechas";
+import { avisoRangoFechas, formatearFecha, formatearMes, rangoUltimosMeses } from "@/lib/fechas";
 import { formatearPorcentaje } from "@/lib/indicadores";
 import type {
   AvistamientosMes, OcupacionOperativo, ProcedimientosZona, ReporteEstadistico,
@@ -219,7 +219,9 @@ export function ReportesEstadisticos() {
         <FiltroFecha etiqueta="Desde" valor={filtros.desde} onCambiar={cambiar("desde")} />
         <FiltroFecha etiqueta="Hasta" valor={filtros.hasta} onCambiar={cambiar("hasta")} />
         {!rangoValido && (
-          <p role="alert" className="text-sm text-destructive">Elija un rango válido: «desde» no puede ser posterior a «hasta».</p>
+          <p role="alert" className="text-sm text-destructive">
+            {avisoRangoFechas(filtros.desde, filtros.hasta) ?? "Elija un rango válido: complete «desde» y «hasta»."}
+          </p>
         )}
       </div>
       {!data ? (

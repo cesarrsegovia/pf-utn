@@ -9,13 +9,15 @@ import type { EstadoListado } from "@/hooks/use-listado";
 /**
  * Listado completo de un módulo: buscador, filtros opcionales, tabla y paginación,
  * conectado al estado de `useListado`. Sin `placeholderBusqueda` no muestra el buscador.
+ * `aviso` muestra debajo de los filtros un mensaje de validación (por ejemplo, un rango de fechas invertido).
  */
-export function ListadoPaginado<T>({ listado, columnas, claveFila, placeholderBusqueda, filtros, mensajeVacio }: {
+export function ListadoPaginado<T>({ listado, columnas, claveFila, placeholderBusqueda, filtros, aviso, mensajeVacio }: {
   listado: EstadoListado<T>;
   columnas: Columna<T>[];
   claveFila: (fila: T) => string | number;
   placeholderBusqueda?: string;
   filtros?: ReactNode;
+  aviso?: string | null;
   mensajeVacio?: string;
 }) {
   return (
@@ -26,6 +28,7 @@ export function ListadoPaginado<T>({ listado, columnas, claveFila, placeholderBu
           {filtros}
         </div>
       )}
+      {aviso && <p role="alert" className="mb-4 text-sm text-destructive">{aviso}</p>}
       <TablaDatos
         columnas={columnas}
         filas={listado.datos?.filas}
