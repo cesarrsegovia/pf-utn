@@ -28,31 +28,75 @@ indicadores del programa.
 
 ## Stack
 
-Next.js 16 (App Router) + TypeScript · PostgreSQL 18 · Sequelize · Tailwind CSS v4 + shadcn/ui · Recharts · JWT (jose) · bcryptjs · Nodemailer · Vitest.
+Next.js 16.4 (App Router, Turbopack) + TypeScript · PostgreSQL 18 · Sequelize · Tailwind CSS v4 + shadcn/ui · Recharts · JWT (jose) · bcryptjs · Nodemailer · Vitest.
 
 ## Requisitos
 
-- Node.js 20.9 o superior
-- Docker Desktop
+- Node.js 20.9 o superior (probado con 20.19).
+- Docker Desktop **en ejecución** (la base de datos corre en un contenedor).
+- Puertos libres: `3000` (aplicación) y `5433` (PostgreSQL; se usa 5433 para no chocar con un PostgreSQL local en 5432).
 
-## Instalación
+## Instalación desde cero
+
+Desde la carpeta del proyecto:
 
 ```bash
-npm install
-cp .env.example .env          # completar JWT_SECRET y CRON_SECRET (y SMTP_* para enviar correos)
-docker compose up -d          # PostgreSQL 18 en localhost:5433 (bases sigcan y sigcan_test)
-npm run db:demo               # crea el esquema y carga los datos de demostración
+# 1. Dependencias (respeta las versiones exactas de package-lock.json)
+npm ci
+
+# 2. Variables de entorno
+cp .env.example .env          # en PowerShell: Copy-Item .env.example .env
+#    Completar en .env: JWT_SECRET y CRON_SECRET (textos largos y aleatorios).
+#    SMTP_USER y SMTP_PASS son opcionales (ver "Notificaciones por correo").
+
+# 3. Base de datos: PostgreSQL 18 con las bases sigcan (desarrollo) y sigcan_test (tests)
+docker compose up -d
+
+# 4. Esquema y datos: aplica las migraciones, carga los datos iniciales y el escenario de demostración
+npm run db:demo
+
+# 5. Aplicación
 npm run dev                   # http://localhost:3000
 ```
 
-Para una base vacía (solo roles, administrador y zonas), usar `npm run db:reset` en lugar de `npm run db:demo`.
+Para empezar con una base vacía (solo roles, administrador y zonas), usar `npm run db:reset` en
+lugar de `npm run db:demo`.
+
+> La primera vez que se crea el contenedor, `docker/init/01-crear-base-test.sql` crea la base
+> `sigcan_test`. Si el volumen ya existía de antes, ese script no se vuelve a ejecutar: ver
+> "Problemas frecuentes".
+
+## Actualizar una instalación existente
+
+Después de traer cambios del repositorio:
+
+```bash
+npm ci                        # por si cambiaron las dependencias
+docker compose up -d          # si el contenedor estaba detenido
+npm run db:migrar             # aplica solo las migraciones nuevas, sin borrar datos
+npm run dev
+```
+
+Las migraciones están en `db/migrations/` y se registran en la tabla `migraciones_aplicadas`, de
+modo que cada una se ejecuta una sola vez. `npm run db:migrar` **conserva los datos**; en cambio,
+`db:reset` y `db:demo` **borran la base de desarrollo** y la vuelven a crear.
+
+## Ejecución en modo producción
+
+```bash
+npm run build
+npm start                     # http://localhost:3000
+```
+
+Usa la misma base y el mismo `.env` que el modo desarrollo. Al iniciar el servidor arranca el
+procesador de notificaciones (si el correo está configurado).
 
 ## Datos de demostración
 
 `npm run db:demo` **borra la base de desarrollo** y carga un escenario con fechas relativas al día
 de ejecución: 30 vecinos en 6 zonas, 50 animales, 8 operativos realizados, 2 cancelados, uno
 **de hoy** listo para iniciar y 3 futuros, insumos con consumo real y 18 avistamientos.
-Conviene ejecutarlo el mismo día de la demostración.
+**Ejecutarlo el mismo día de la demostración**: con datos de otro día no hay operativo "de hoy".
 
 | Rol | Email | Contraseña |
 |---|---|---|
@@ -67,10 +111,11 @@ El administrador se toma de `SEED_ADMIN_EMAIL` / `SEED_ADMIN_PASSWORD` (valores 
 
 Las notificaciones se registran siempre; se envían si están completos `SMTP_HOST`, `SMTP_USER` y
 `SMTP_PASS` en `.env` (con Gmail: `smtp.gmail.com`, puerto 465 y una contraseña de aplicación).
-Un procesador interno envía las pendientes periódicamente; también se puede forzar desde
-Notificaciones → "Procesar pendientes" o con `POST /api/notificaciones/procesar` y el encabezado
-`Authorization: Bearer <CRON_SECRET>`. En la demo, solo la vecina "Prueba Correo" (perro "Toby")
-tiene email.
+Con el correo configurado, un procesador interno envía las pendientes cada minuto; sin él, quedan
+registradas como pendientes y la pantalla de Notificaciones lo indica. El envío también se puede
+forzar desde Notificaciones → "Procesar pendientes" o con `POST /api/notificaciones/procesar` y el
+encabezado `Authorization: Bearer <CRON_SECRET>`. En la demo, solo la vecina "Prueba Correo"
+(perro "Toby") tiene email.
 
 ## Scripts
 
@@ -79,8 +124,8 @@ tiene email.
 | `npm run dev` | Servidor de desarrollo |
 | `npm run build` / `npm start` | Build y ejecución de producción |
 | `npm run lint` | ESLint |
-| `npm test` | Tests automáticos (recrean la base `sigcan_test`) |
-| `npm run db:migrar` | Aplica migraciones pendientes |
+| `npm test` | Tests automáticos (recrean la base `sigcan_test`; requieren el contenedor en ejecución) |
+| `npm run db:migrar` | Aplica las migraciones pendientes (conserva los datos) |
 | `npm run db:seed` | Carga datos iniciales (idempotente) |
 | `npm run db:reset` | Borra la base de desarrollo, migra y siembra los datos iniciales |
 | `npm run db:demo` | Igual que `db:reset` y además carga los datos de demostración |
@@ -88,14 +133,25 @@ tiene email.
 
 ## Verificación
 
-- **Tests automáticos:** `npm test` (158 tests: servicios, reglas de negocio, restricciones de la base y escenario de demostración).
+- **Tests automáticos:** `npm test` (161 tests: servicios, reglas de negocio, restricciones de la base y escenario de demostración).
 - **Pruebas de humo** contra el build de producción (`tests/humo/fase3.mjs` a `fase6.mjs`): ver las instrucciones al comienzo de cada archivo.
-- **Recorridos por rol:** `docs/verificacion/recorridos.md`.
+- **Recorridos por rol y prueba funcional:** `docs/verificacion/`.
+
+## Problemas frecuentes
+
+| Síntoma | Solución |
+|---|---|
+| `npm test` falla con `database "sigcan_test" does not exist` | El volumen de Docker es anterior al script de inicio. Crear la base a mano: `docker exec sigcan-db psql -U sigcan -d sigcan -c "CREATE DATABASE sigcan_test OWNER sigcan;"` |
+| `ECONNREFUSED` en el puerto 5433 | Docker Desktop o el contenedor están detenidos: abrir Docker Desktop y ejecutar `docker compose up -d`. |
+| La página se recarga sola sin parar, los estilos no se actualizan o aparece un error de compilación de Next.js | Caché de desarrollo dañada: detener `npm run dev`, borrar la carpeta `.next/dev` y volver a iniciar. |
+| El puerto 3000 está ocupado | Quedó un servidor anterior en ejecución: cerrarlo (en Windows, `Get-NetTCPConnection -LocalPort 3000` muestra el proceso) o usar `npx next dev -p 3001`. |
+| El inicio no muestra un operativo "de hoy" | Los datos de demostración son de otro día: ejecutar `npm run db:demo`. |
 
 ## Estructura
 
 ```
 db/            migraciones y seeders (inicial y demostración)
+docker/        script de inicio de PostgreSQL (crea la base de test)
 scripts/       CLI de base de datos
 src/app/       páginas (panel por rol) y API REST (Route Handlers)
 src/components/ componentes de interfaz por módulo y comunes
@@ -104,5 +160,5 @@ src/schemas/   validación (Zod) compartida entre cliente y servidor
 src/lib/       conexión, asociaciones, permisos, fechas, correo y utilidades
 src/models/    un modelo Sequelize por tabla del ERD
 tests/         tests automáticos (Vitest) y pruebas de humo
-docs/          consigna, diseño, planes, recorridos de verificación
+docs/          consigna, diseño, planes y verificación (no se versiona: ver .gitignore)
 ```

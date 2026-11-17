@@ -19,6 +19,6 @@ npm-debug.log*
 .DS_Store
 /coverage
 
-/docs
+
 CLAUDE.md
 AGENTS.md
